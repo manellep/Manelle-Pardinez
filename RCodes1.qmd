@@ -1,0 +1,82 @@
+---
+title: "R Workshop #1: Data Wrangling"
+author: Tae Yoon Lee
+editor: visual
+---
+
+Hello everyone!
+
+```{r packages}
+library(tidyverse)
+library(janitor)
+library(here)
+```
+
+```{r CLT}
+n <- 20
+ns <- 10000
+
+means <- total_samples <- c()
+
+for(i in 1:ns){
+  samples <- rexp(n=n,rate = 4)
+  total_samples <- append(total_samples,samples)
+  means <- append(means,mean(samples))
+}
+
+hist(total_samples,breaks=100)
+hist(means,breaks=100)
+```
+
+```{r read data}
+df <- read_csv("data/gusto.csv")
+```
+
+```{r take a peak at the data}
+head(df)
+tail(df)
+```
+
+```{r select a subset of variables}
+df_subset <- select(df,day30:height)
+```
+
+```{r filtering}
+df_subset_male <- filter(df_subset,sex=="male") 
+```
+
+```{r piping}
+df_subset_male_piping <- df %>% 
+  select(day30:height) %>% 
+  filter(sex=="male") %>% 
+  custom_function("harry",.)
+
+identical(df_subset_male,df_subset_male_piping)
+```
+
+```{r mutate}
+# express height in meters
+df %>% 
+  mutate(height_meters = height / 100)
+
+summary(df_subset)
+
+# how do we modify sex?
+```
+
+```{r grouping}
+df_grouped <- df %>% 
+  group_by(sex)
+```
+
+```{r summary}
+df_grouped %>% 
+  summarise(n=n(),
+            mean_age = mean(age),
+            mean_height = mean(height))
+```
+
+```{r visualization}
+ggplot(data=df,aes(x=sex,y=age)) +
+  geom_point()
+```
